@@ -1,0 +1,7 @@
+{
+    "nixEnvSelector.nixFile": "${workspaceRoot}/devenv.nix",
+    "rust-analyzer.linkedProjects": [
+        "./Cargo.toml"
+    ],
+    "rust-analyzer.showUnlinkedFileNotification": false
+}
