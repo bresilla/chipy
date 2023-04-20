@@ -20,7 +20,7 @@ impl Kind {
             Kind::Or => io!(a | b),
             Kind::Nor => io!(!(a | b)),
             Kind::And => io!(a & b),
-            Kind:: Nand => io!(!(a & b)),
+            Kind::Nand => io!(!(a & b)),
             Kind::Xor => io!(a ^ b),
             Kind::Xnor => io!(!(a ^ b)),
             Kind::Not => io!(!a)

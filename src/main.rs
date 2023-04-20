@@ -14,7 +14,7 @@ fn main() {
     // let mut or = Gate::new(Kind::Or, [OFF, ON]);
     // or.calc();
     // or.print();
-    // let mut and = Gate::new(Kind::And, [OFF, ON]);
+    // let mut and = Gate::new(Kind::Nand, [OFF, OFF], None);
     // and.calc();
     // and.print();
     // let mut nor = Gate::new(Kind::Nor, [OFF, OFF]);
@@ -24,13 +24,55 @@ fn main() {
     // not.calc();
     // not.print();
 
-    let mut srl = SRLatch::new(OFF, ON, None);
+    // let mut latch = SRLatch::new(ON, ON, None);
+    // latch.calc();
+    // latch.print();
+    // latch.s_off();
+    // latch.calc();
+    // latch.print();
+    // latch.calc();
+    // latch.print();
+    // latch.calc();
+    // latch.print();
+    // latch.s_on();
+    // latch.calc();
+    // latch.print();
+    // latch.r_off();
+    // latch.calc();
+    // latch.print();
+    
+
+    let mut srl = DFlipFlop::new(OFF, OFF, None);
     // srl.print();
     srl.calc();
     srl.print();
-
-    // srl.calc();
-    // srl.print();
-
-    // println!("{}", srl);
+    println!("----------------");
+    srl.calc();
+    srl.print();
+    println!("----------------");
+    srl.set_c(ON);
+    srl.set_d(ON);
+    srl.calc();
+    srl.print();
+    println!("----------------");
+    srl.set_c(OFF);
+    srl.calc();
+    srl.print();
+    println!("----------------");
+    srl.set_c(ON);
+    srl.calc();
+    srl.print();
+    println!("----------------");
+    srl.set_c(OFF);
+    srl.calc();
+    srl.print();
+    srl.set_c(ON);
+    println!("----------------");
+    srl.set_d(OFF);
+    srl.calc();
+    srl.print();
+    println!("----------------");
+    srl.set_c(OFF);
+    srl.calc();
+    srl.print();
 }

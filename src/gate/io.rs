@@ -1,5 +1,6 @@
 use std::fmt::{self, Display, Formatter};
 use colorized::*;
+use std::ops;
 
 #[repr(transparent)]
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Debug, Ord, PartialOrd)]
@@ -28,7 +29,7 @@ impl IO {
         match self.state {
             Some(true) => self.state = Some(false),
             Some(false) => self.state = Some(true),
-            None => { unreachable!("NOT INITIALIZED") }
+            None => { unreachable!("NONE") }
         }
         self
     }
@@ -41,12 +42,23 @@ impl IO {
     }
 }
 
+impl ops::Not for IO {
+    type Output = IO;
+    fn not(self) -> Self::Output {
+        match self.state {
+            Some(true) => OFF,
+            Some(false) => ON,
+            None => NONE
+        }
+    }
+}
+
 impl Display for IO {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match self.state {
-            Some(true) => write!(f, "{}", String::from("ON").color(Colors::GreenFg)),
-            Some(false) => write!(f, "{}", String::from("OFF").color(Colors::RedFg)),
-            None => { write!(f, "NOT INITIALIZED") }
+            Some(true) => write!(f, "{}", String::from("1").color(Colors::GreenFg)),
+            Some(false) => write!(f, "{}", String::from("0").color(Colors::RedFg)),
+            None => { write!(f, "/") }
         }
     }
 }

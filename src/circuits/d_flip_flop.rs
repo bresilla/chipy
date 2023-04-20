@@ -1,50 +1,76 @@
-use crate::IO;
-// use crate::{Gate, Kind};
-// use super::*;
-#[derive(Clone, Debug, Eq, PartialEq, Hash)]
+use super::*;
+use crate::{IO, OFF, ON, NONE, DELAY};
+use crate::{Gate, Kind};
+use std::fmt::{Display, Formatter};
+use std::{thread, time::Duration};
 
+
+#[derive(Clone, Debug, Eq, PartialEq, Hash)]
 pub struct DFlipFlop {
+    //inputs
+    c: IO,
     d: IO,
-    g: IO,
-    clock: IO,
-    reset: IO,
-    write: IO,
-    read: IO,
-    name: String,
+    //outputs
+    q: IO,
+    qn: IO,
+    //internal
+    sr_flip_flop: SRFlipFlop,
+    name: Option<String>,
 }
 
-
-
-// impl Node for DFlipFlop {
-//     fn calc(&mut self) -> &Self {
-//         let name = format!("DFLIPFLOP:{}", self.name);
-
-//         let input = self.d;
-//         let clock = Gate::new(Kind::And, [self.clock, self.write]);
-//         // let clock = self.g.and2(self.clock, self.write, name.clone());
-//         let ninput = Gate::new(Kind::Not, [input, input]);
-//         // let ninput = g.not1(input, name.clone());
+impl DFlipFlop {
+    pub fn new(c: IO, d: IO, name: Option<String>) -> Self {
+        DFlipFlop {
+            c,
+            d,
+            q: NONE,
+            qn: NONE,
+            sr_flip_flop: SRFlipFlop::new(OFF, OFF, ON, None),
+            name,
+        }
+    }
+    pub fn get_d(&self) -> IO { self.d }
+    pub fn set_d(&mut self, io: IO) { self.d = io }
+    pub fn get_c(&self) -> IO { self.c }
+    pub fn set_c(&mut self, io: IO) { self.c = io }
+    pub fn get_q(&self) -> IO { self.q }
+    pub fn get_qn(&self) -> IO { self.qn }
     
-//         // let s_and = g.and2(input, clock, name.clone());
-//         let s_and = Gate::new(Kind::And, [input, clock.out()]);
-//         // let r_and = g.and2(ninput, clock, name.clone());
-//         let r_and = Gate::new(Kind::And, [ninput.out(), clock.out()]);
-    
-//         // let r_or = g.or2(r_and, reset, name.clone());
-//         let r_or = Gate::new(Kind::Or, [r_and.out(), self.reset]);
-    
-//         // let q = sr_latch(g, s_and, r_or, name.clone());
-        
-//         // g.and2(q, read, name)
-//         self
+    pub fn name(&mut self, name: String) { self.name = Some(name) }
+    pub fn print(&self) { println!("{}", self);}
+}
 
-//         // let name = format!("SRLATCH:{}", self.name);
-//         // self.q = Gate::new(Kind::Nor, [self.r, io!(false)]).out();
-//         // self.qn = Gate::new(Kind::Nor, [self.s, self.q]).out();
-//         // self
-//     }
-// }
+impl Node for DFlipFlop {
+    #[inline(always)]
+    fn is_init(&self) -> bool { self.q.is_init() && self.qn.is_init() }
+    fn calc(&mut self) -> &Self {
+        thread::sleep(Duration::from_nanos(DELAY));
+        let mut d_not = Gate::new(Kind::Not, [self.d, self.d], None);
+        d_not.calc();
+        self.sr_flip_flop.set_c(self.c);
+        self.sr_flip_flop.set_s(self.d);
+        self.sr_flip_flop.set_r(d_not.out());
+        self.sr_flip_flop.calc();
+        self.q = self.sr_flip_flop.get_q();
+        self.qn = self.sr_flip_flop.get_qn();
+        self
+    }
+    fn calc_op(&mut self) -> &Self {
+        self.calc()
+    }
+}
 
-
+impl Display for DFlipFlop {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        let name = if self.name.is_none() { "DFLIPFLOP".to_string() } else { format!("DFLIPFLOP:{}", self.name.clone().unwrap()) };
+        write!(f, "kind: <{}>, clock: <{}>, input: <{}>, outputs: <{}, {}>",
+            name,
+            self.c,
+            self.d,
+            self.q,
+            self.qn
+        )
+    }
+}
 
 
